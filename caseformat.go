@@ -55,10 +55,11 @@ func tokenize(str string) [][]rune {
 	bufLen := len(buf)
 	current := make([]rune, 0)
 	for i := 0; i < bufLen; i += 1 {
-		inRange, inRange2 := i < bufLen-1, i < bufLen-2
-		aLower, bLower, cLower := unicode.IsLower(buf[i]), inRange && unicode.IsLower(buf[i+1]), inRange2 && unicode.IsLower(buf[i+2])
-		aLetter, bLetter := unicode.IsLetter(buf[i]), inRange && unicode.IsLetter(buf[i+1])
-		split := !bLetter || (aLower && !bLower) || (!aLower && !bLower && cLower)
+		canLookBehind, canLookAhead1, canLookAhead2 := i > 0, i < bufLen-1, i < bufLen-2
+		aLower, bLower := unicode.IsLower(buf[i]), canLookAhead1 && unicode.IsLower(buf[i+1])
+		aLetter, bLetter := unicode.IsLetter(buf[i]), canLookAhead1 && unicode.IsLetter(buf[i+1])
+		behindLower, ahead2Lower := canLookBehind && unicode.IsLower(buf[i-1]), canLookAhead2 && unicode.IsLower(buf[i+2])
+		split := !bLetter || (aLower && !bLower) || (!aLower && !bLower && (behindLower || ahead2Lower))
 		if aLetter {
 			current = append(current, unicode.ToLower(buf[i]))
 			if split {
