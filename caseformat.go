@@ -50,16 +50,18 @@ func ToUpperUnderscore(str string) string {
 }
 
 func tokenize(str string) [][]rune {
+
 	parts := make([][]rune, 0)
 	buf := []rune(str)
 	bufLen := len(buf)
 	current := make([]rune, 0)
+
 	for i := 0; i < bufLen; i += 1 {
 		canLookBehind, canLookAhead1, canLookAhead2 := i > 0, i < bufLen-1, i < bufLen-2
 		aLower, bLower := unicode.IsLower(buf[i]), canLookAhead1 && unicode.IsLower(buf[i+1])
 		aLetter, bLetter := unicode.IsLetter(buf[i]), canLookAhead1 && unicode.IsLetter(buf[i+1])
 		behindLower, ahead2Lower := canLookBehind && unicode.IsLower(buf[i-1]), canLookAhead2 && unicode.IsLower(buf[i+2])
-		split := !bLetter || (aLower && !bLower) || (!aLower && !bLower && (behindLower || ahead2Lower))
+		split := !bLetter || (aLower && !bLower) || (!aLower && !bLower && (behindLower || ahead2Lower || i == 0))
 		if aLetter {
 			current = append(current, unicode.ToLower(buf[i]))
 			if split {
@@ -68,8 +70,10 @@ func tokenize(str string) [][]rune {
 			}
 		}
 	}
+
 	if len(current) > 0 {
 		parts = append(parts, current)
 	}
+
 	return parts
 }
